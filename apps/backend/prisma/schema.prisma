@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TransactionType {
+  NEED
+  WANT
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  amount      Int
+  category    String
+  description String
+  type        TransactionType
+  aiFeedback  String?
+  createdAt   DateTime        @default(now())
+  embedding   Unsupported("vector(768)")?
+}
+
+model Budget {
+  id           String   @id @default(uuid())
+  monthlyLimit Int
+  currentSpend Int      @default(0)
+  period       String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

@@ -1,0 +1,21 @@
+{
+  "name": "ai-pocket-guard",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/mobile",
+    "apps/backend"
+  ],
+  "scripts": {
+    "mobile": "npm run start --workspace @ai-pocket-guard/mobile",
+    "backend": "npm run start:dev --workspace @ai-pocket-guard/backend",
+    "build": "npm run build --workspace @ai-pocket-guard/backend",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "npm run format --workspaces --if-present",
+    "prisma:generate": "npm run prisma:generate --workspace @ai-pocket-guard/backend",
+    "prisma:migrate": "npm run prisma:migrate --workspace @ai-pocket-guard/backend"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
