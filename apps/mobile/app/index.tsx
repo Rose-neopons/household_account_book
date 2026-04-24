@@ -26,10 +26,23 @@ const CATEGORY_SPEND = [
     ratio: 0.42,
     color: '#F9A8D4',
     icon: 'silverware-fork-knife',
+    total: '18만원',
   },
-  { label: '쇼핑', ratio: 0.24, color: '#C4B5FD', icon: 'shopping-outline' },
-  { label: '교통', ratio: 0.18, color: '#93C5FD', icon: 'bus' },
-  { label: '커피', ratio: 0.16, color: '#86EFAC', icon: 'coffee-outline' },
+  {
+    label: '쇼핑',
+    ratio: 0.24,
+    color: '#C4B5FD',
+    icon: 'shopping-outline',
+    total: '10만원',
+  },
+  { label: '교통', ratio: 0.18, color: '#93C5FD', icon: 'bus', total: '7만원' },
+  {
+    label: '커피',
+    ratio: 0.16,
+    color: '#86EFAC',
+    icon: 'coffee-outline',
+    total: '6만원',
+  },
 ] as const;
 
 type QuickInputState = {
@@ -323,26 +336,47 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.healthSummaryCard}>
-            <View style={styles.healthSummaryTitleRow}>
-              <Text style={styles.healthSummaryTitle}>오늘의 소비 빌런</Text>
-              <MaterialCommunityIcons
-                color="#F97393"
-                name="alert-circle-outline"
-                size={16}
-              />
-            </View>
-            <View style={styles.healthSummaryHeaderRow}>
-              <Text style={styles.healthSummaryCategory}>
-                {topCategory.label}
-              </Text>
-              <View style={styles.healthSummaryRatioBadge}>
-                <Text style={styles.healthSummaryRatioText}>
-                  {Math.round(topCategory.ratio * 100)}%
-                </Text>
+            <View style={styles.healthSummaryMainRow}>
+              <View style={styles.healthSummaryLeft}>
+                <View style={styles.healthSummaryTitleRow}>
+                  <Text style={styles.healthSummaryTitle}>오늘의 소비 빌런</Text>
+                  <MaterialCommunityIcons
+                    color="#F97393"
+                    name="alert-circle-outline"
+                    size={16}
+                  />
+                </View>
+                <View style={styles.healthSummaryHeaderRow}>
+                  <Text style={styles.healthSummaryCategory}>
+                    {topCategory.label}
+                  </Text>
+                  <View style={styles.healthSummaryRatioBadge}>
+                    <Text style={styles.healthSummaryRatioText}>
+                      {Math.round(topCategory.ratio * 100)}%
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.healthSummaryInsight}>배달 음식 많아요!</Text>
+              </View>
+
+              <View style={styles.healthSummaryVisual}>
+                <View
+                  style={[
+                    styles.healthSummaryVisualBubble,
+                    { backgroundColor: `${topCategory.color}33` },
+                  ]}
+                >
+                  <MaterialCommunityIcons
+                    color={topCategory.color}
+                    name={topCategory.icon}
+                    size={38}
+                  />
+                </View>
+                <Text style={styles.healthSummaryAmount}>{topCategory.total}</Text>
               </View>
             </View>
-            <Text style={styles.healthSummaryInsight}>배달 음식 많아요!</Text>
-            <View style={styles.healthSummaryTipRow}>
+
+            <View style={styles.healthSummaryActionBar}>
               <MaterialCommunityIcons
                 color="#F97393"
                 name="food-variant"
@@ -816,17 +850,17 @@ const styles = StyleSheet.create({
   healthEmojiRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
-    paddingHorizontal: 4,
+    marginTop: 12,
+    paddingHorizontal: 6,
   },
   healthEmojiCol: {
     alignItems: 'center',
     gap: 4,
   },
   healthEmojiBubble: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -836,11 +870,19 @@ const styles = StyleSheet.create({
     fontFamily: FONT_TITLE,
   },
   healthSummaryCard: {
-    marginTop: 12,
-    borderRadius: 20,
+    marginTop: 14,
+    borderRadius: 24,
     backgroundColor: '#FFFFFF',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    padding: 16,
+  },
+  healthSummaryMainRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    gap: 14,
+  },
+  healthSummaryLeft: {
+    flex: 1,
+    justifyContent: 'space-between',
   },
   healthSummaryTitle: {
     color: '#4B426F',
@@ -853,25 +895,25 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   healthSummaryHeaderRow: {
-    marginTop: 10,
+    marginTop: 8,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
   healthSummaryCategory: {
     color: '#4B426F',
-    fontSize: 24,
+    fontSize: 28,
     fontFamily: FONT_TITLE,
   },
   healthSummaryRatioBadge: {
     borderRadius: 999,
     backgroundColor: '#F97393',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 7,
   },
   healthSummaryRatioText: {
     color: '#FFFFFF',
-    fontSize: 15,
+    fontSize: 16,
     fontFamily: FONT_TITLE,
   },
   healthSummaryInsight: {
@@ -880,15 +922,42 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: FONT_BODY,
   },
-  healthSummaryTipRow: {
-    marginTop: 8,
+  healthSummaryVisual: {
+    width: 108,
+    borderRadius: 22,
+    backgroundColor: '#FFF8FB',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  healthSummaryVisualBubble: {
+    width: 64,
+    height: 64,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  healthSummaryAmount: {
+    marginTop: 10,
+    color: '#4B426F',
+    fontSize: 18,
+    fontFamily: FONT_TITLE,
+  },
+  healthSummaryActionBar: {
+    marginTop: 14,
+    borderRadius: 16,
+    backgroundColor: '#FFF1F6',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
   },
   healthSummaryTip: {
     color: '#F97393',
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: FONT_TITLE,
   },
   nudgeCard: {
