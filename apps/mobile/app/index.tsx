@@ -151,12 +151,15 @@ function RainbowBottle() {
                 <View
                   key={tick}
                   style={[
-                    styles.smartBottleTick,
+                    styles.smartBottleTickRow,
                     {
                       bottom: `${tick}%`,
                     },
                   ]}
-                />
+                >
+                  <View style={styles.smartBottleTick} />
+                  <Text style={styles.smartBottleTickLabel}>{tick}</Text>
+                </View>
               ))}
             </View>
 
@@ -299,48 +302,35 @@ export default function HomeScreen() {
 
           <View style={styles.healthEmojiRow}>
             {CATEGORY_SPEND.map((item) => (
-              <View
-                key={`emoji-${item.label}`}
-                style={[
-                  styles.healthEmojiBubble,
-                  { backgroundColor: `${item.color}33` },
-                ]}
-              >
-                <MaterialCommunityIcons
-                  color="#5E4B91"
-                  name={item.icon}
-                  size={18}
-                />
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.healthLegend}>
-            {CATEGORY_SPEND.map((item) => (
-              <View key={item.label} style={styles.healthLegendItem}>
+              <View key={`emoji-${item.label}`} style={styles.healthEmojiCol}>
                 <View
                   style={[
-                    styles.healthLegendDot,
-                    { backgroundColor: item.color },
+                    styles.healthEmojiBubble,
+                    { backgroundColor: `${item.color}33` },
                   ]}
-                />
-                <Text style={styles.healthLegendText}>
-                  {item.label} {Math.round(item.ratio * 100)}%
+                >
+                  <MaterialCommunityIcons
+                    color={item.color}
+                    name={item.icon}
+                    size={18}
+                  />
+                </View>
+                <Text style={styles.healthEmojiRatio}>
+                  {Math.round(item.ratio * 100)}%
                 </Text>
               </View>
             ))}
           </View>
 
-          <View style={styles.healthFooter}>
-            <Text style={styles.healthHint}>
-              {topCategory.label} 비중이 가장 커요.
-            </Text>
-          </View>
-
           <View style={styles.healthSummaryCard}>
-            <Text style={styles.healthSummaryTitle}>
-              이번 달 집중 관리 항목
-            </Text>
+            <View style={styles.healthSummaryTitleRow}>
+              <Text style={styles.healthSummaryTitle}>오늘의 소비 빌런</Text>
+              <MaterialCommunityIcons
+                color="#F97393"
+                name="alert-circle-outline"
+                size={16}
+              />
+            </View>
             <View style={styles.healthSummaryHeaderRow}>
               <Text style={styles.healthSummaryCategory}>
                 {topCategory.label}
@@ -562,6 +552,11 @@ const styles = StyleSheet.create({
   heroTextWrap: {
     flex: 1,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   eyebrow: {
     color: '#8D79C6',
     fontSize: 13,
@@ -654,18 +649,27 @@ const styles = StyleSheet.create({
   },
   smartBottleTicks: {
     position: 'absolute',
-    right: -10,
+    right: -14,
     top: 12,
     bottom: 12,
-    justifyContent: 'space-between',
   },
-  smartBottleTick: {
+  smartBottleTickRow: {
     position: 'absolute',
     right: 0,
-    width: 12,
-    borderTopWidth: 2,
-    borderTopColor: '#D2C9EC',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  smartBottleTick: {
+    width: 9,
+    borderTopWidth: 1.5,
+    borderTopColor: '#D5DBE8',
     borderStyle: 'dashed',
+  },
+  smartBottleTickLabel: {
+    color: '#C6CCDA',
+    fontSize: 8,
+    fontFamily: FONT_TITLE,
   },
   smartBottleMilk: {
     width: '100%',
@@ -736,7 +740,7 @@ const styles = StyleSheet.create({
   metricRow: {
     flexDirection: 'row',
     gap: 10,
-    marginTop: 18,
+    marginTop: 14,
   },
   metricPill: {
     flex: 1,
@@ -757,10 +761,10 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   healthCard: {
-    marginTop: 16,
+    marginTop: 12,
     borderRadius: 30,
     backgroundColor: '#FFF1F7',
-    padding: 20,
+    padding: 16,
   },
   healthHeader: {
     flexDirection: 'row',
@@ -775,10 +779,10 @@ const styles = StyleSheet.create({
   },
   sectionCaption: {
     color: '#7D739E',
-    fontSize: 12,
+    fontSize: 11,
     fontFamily: FONT_BODY,
-    lineHeight: 17,
-    marginTop: 6,
+    lineHeight: 14,
+    marginTop: 4,
     maxWidth: 240,
   },
   sectionBadge: {
@@ -792,7 +796,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   healthTrack: {
-    marginTop: 18,
+    marginTop: 12,
     position: 'relative',
     overflow: 'hidden',
     borderRadius: 999,
@@ -812,8 +816,12 @@ const styles = StyleSheet.create({
   healthEmojiRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 12,
+    marginTop: 10,
     paddingHorizontal: 4,
+  },
+  healthEmojiCol: {
+    alignItems: 'center',
+    gap: 4,
   },
   healthEmojiBubble: {
     width: 34,
@@ -822,38 +830,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  healthLegend: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 12,
-  },
-  healthLegendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  healthLegendDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 999,
-  },
-  healthLegendText: {
+  healthEmojiRatio: {
     color: '#6E678C',
     fontSize: 12,
     fontFamily: FONT_TITLE,
   },
-  healthFooter: {
-    marginTop: 14,
-  },
-  healthHint: {
-    color: '#6F668E',
-    fontSize: 12,
-    fontFamily: FONT_BODY,
-    lineHeight: 17,
-  },
   healthSummaryCard: {
-    marginTop: 16,
+    marginTop: 12,
     borderRadius: 20,
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
@@ -863,6 +846,11 @@ const styles = StyleSheet.create({
     color: '#4B426F',
     fontSize: 14,
     fontFamily: FONT_TITLE,
+  },
+  healthSummaryTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   healthSummaryHeaderRow: {
     marginTop: 10,
@@ -877,13 +865,13 @@ const styles = StyleSheet.create({
   },
   healthSummaryRatioBadge: {
     borderRadius: 999,
-    backgroundColor: '#FDE7F1',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    backgroundColor: '#F97393',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
   },
   healthSummaryRatioText: {
-    color: '#F97393',
-    fontSize: 13,
+    color: '#FFFFFF',
+    fontSize: 15,
     fontFamily: FONT_TITLE,
   },
   healthSummaryInsight: {
@@ -904,7 +892,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT_TITLE,
   },
   nudgeCard: {
-    marginTop: 16,
+    marginTop: 12,
     borderRadius: 28,
     backgroundColor: '#E6FBF3',
     padding: 18,
@@ -936,7 +924,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   inputCard: {
-    marginTop: 16,
+    marginTop: 12,
     borderRadius: 30,
     backgroundColor: '#FFFFFF',
     padding: 18,
@@ -1005,7 +993,7 @@ const styles = StyleSheet.create({
   previewRow: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 16,
+    marginTop: 12,
   },
   previewCard: {
     flex: 1,
