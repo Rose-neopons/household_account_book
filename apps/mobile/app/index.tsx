@@ -20,6 +20,12 @@ const BUDGET_RATIO = 1;
 const BOTTLE_STRIPES = ['#86EFAC', '#93C5FD', '#C4B5FD', '#F9A8D4'];
 const TRACK_STRIPES = [...BOTTLE_STRIPES].reverse();
 const BOTTLE_GLASS_HEIGHT = 144;
+const CATEGORY_SPEND = [
+  { label: '식비', ratio: 0.42, color: '#F9A8D4' },
+  { label: '쇼핑', ratio: 0.24, color: '#C4B5FD' },
+  { label: '교통', ratio: 0.18, color: '#93C5FD' },
+  { label: '커피', ratio: 0.16, color: '#86EFAC' },
+];
 
 type QuickInputState = {
   prompt: string;
@@ -71,7 +77,7 @@ function MascotBubble() {
       <View style={styles.mascotSpeech}>
         <Text style={styles.mascotSpeechTitle}>포켓가드 한마디</Text>
         <Text style={styles.mascotSpeechBody}>
-          오늘 소비를 말해주면 내가 귀엽게 정리해줄게요.
+          오늘은 배가 든든해서 기분이 좋아. 이 흐름이면 우리 둘 다 안심하고 잘 수 있을 것 같아.
         </Text>
       </View>
     </Animated.View>
@@ -127,9 +133,7 @@ function RainbowBottle() {
     <View style={styles.bottleWrap}>
       <View style={styles.smartBottleContainer}>
         <View style={styles.smartBottleLabel}>
-          <Text style={styles.smartBottleLabelTitle}>
-            현재 우유 {fillPercent}% 남음
-          </Text>
+          <Text style={styles.smartBottleLabelTitle}>예산 우유 기분</Text>
           <Text style={styles.smartBottleLabelBody}>{bottleMood.label}</Text>
         </View>
 
@@ -151,18 +155,7 @@ function RainbowBottle() {
             </View>
 
             <View style={styles.smartBottleGlass}>
-              <View style={styles.smartBottleGuide}>
-                {BOTTLE_STRIPES.map((color) => (
-                  <View
-                    key={`guide-${color}`}
-                    style={[
-                      styles.smartBottleStripe,
-                      styles.smartBottleGuideStripe,
-                      { backgroundColor: color },
-                    ]}
-                  />
-                ))}
-              </View>
+              <View style={styles.smartBottleGuide} />
 
               <Animated.View
                 style={[
@@ -177,7 +170,7 @@ function RainbowBottle() {
                     <View
                       key={`active-${color}`}
                       style={[
-                        styles.smartBottleStripe,
+                        styles.smartBottleFillStripe,
                         { backgroundColor: color },
                       ]}
                     />
@@ -198,7 +191,7 @@ function RainbowBottle() {
                 <MaterialCommunityIcons
                   color="#5E4B91"
                   name={bottleMood.icon}
-                  size={26}
+                  size={42}
                 />
               </View>
             </View>
@@ -215,6 +208,8 @@ function RainbowBottle() {
 
 export default function HomeScreen() {
   const { prompt, setPrompt } = useQuickInputStore();
+  const fillPercent = Math.round(BUDGET_RATIO * 100);
+  const topCategory = CATEGORY_SPEND[0];
 
   const handleAnalyzePress = () => {
     router.push({
@@ -233,7 +228,6 @@ export default function HomeScreen() {
   const handleGuardianPress = () => {
     router.push('/guardian');
   };
-  const fillPercent = Math.round(BUDGET_RATIO * 100);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -274,38 +268,46 @@ export default function HomeScreen() {
         <View style={styles.healthCard}>
           <View style={styles.healthHeader}>
             <View>
-              <Text style={styles.sectionTitle}>예산 우유병</Text>
+              <Text style={styles.sectionTitle}>카테고리별 소비 분포</Text>
               <Text style={styles.sectionCaption}>
-                이번 달 예산의 {fillPercent}%를 포근하게 지키는 중이에요.
+                어디에 가장 많이 쓰고 있는지, 색으로 빠르게 읽을 수 있게 정리했어요.
               </Text>
             </View>
-            <Text style={styles.sectionBadge}>양호</Text>
+            <Text style={styles.sectionBadge}>분석</Text>
           </View>
 
           <View style={styles.healthTrack}>
             <View style={styles.healthTrackBase}>
-              {TRACK_STRIPES.map((color) => (
+              {CATEGORY_SPEND.map((item) => (
                 <View
-                  key={`track-base-${color}`}
-                  style={[styles.healthTrackStripe, { backgroundColor: color }]}
+                  key={`track-base-${item.label}`}
+                  style={[
+                    styles.healthTrackStripe,
+                    { backgroundColor: item.color, flex: item.ratio },
+                  ]}
                 />
               ))}
             </View>
-            <View
-              style={[
-                styles.healthTrackMask,
-                {
-                  left: `${fillPercent}%`,
-                },
-              ]}
-            />
+          </View>
+
+          <View style={styles.healthLegend}>
+            {CATEGORY_SPEND.map((item) => (
+              <View key={item.label} style={styles.healthLegendItem}>
+                <View
+                  style={[styles.healthLegendDot, { backgroundColor: item.color }]}
+                />
+                <Text style={styles.healthLegendText}>
+                  {item.label} {Math.round(item.ratio * 100)}%
+                </Text>
+              </View>
+            ))}
           </View>
 
           <View style={styles.healthFooter}>
             <Text style={styles.healthHint}>
-              외식만 조금 줄이면 잔고 얼굴이 더 웃어요.
+              이번 달엔 {topCategory.label} 비중이 가장 커요. 특히 약속 있는 주에 식비가 확 늘어나는 패턴이 보여요.
             </Text>
-            <Text style={styles.healthPercent}>{fillPercent}%</Text>
+            <Text style={styles.healthPercent}>{topCategory.label}</Text>
           </View>
         </View>
 
@@ -590,17 +592,13 @@ const styles = StyleSheet.create({
     height: BOTTLE_GLASS_HEIGHT,
     borderRadius: 30,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF80',
+    backgroundColor: '#F9FBFF',
     justifyContent: 'flex-end',
   },
   smartBottleGuide: {
     ...StyleSheet.absoluteFillObject,
-  },
-  smartBottleStripe: {
-    flex: 1,
-  },
-  smartBottleGuideStripe: {
-    opacity: 0.08,
+    backgroundColor: '#FFFFFF',
+    opacity: 0.55,
   },
   smartBottleTicks: {
     position: 'absolute',
@@ -630,21 +628,25 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     height: BOTTLE_GLASS_HEIGHT,
+    backgroundColor: '#FFFFFF',
+  },
+  smartBottleFillStripe: {
+    flex: 1,
   },
   smartBottleWave: {
     marginTop: -6,
     height: 14,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    backgroundColor: '#F9A8D4',
-    opacity: 0.22,
+    backgroundColor: '#FFFFFFCC',
+    opacity: 0.85,
   },
   smartBottleWaveHidden: {
     opacity: 0,
   },
   smartBottleFace: {
     position: 'absolute',
-    top: 52,
+    top: 44,
     left: 0,
     right: 0,
     alignItems: 'center',
@@ -725,41 +727,54 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     borderRadius: 999,
-    height: 20,
-    backgroundColor: '#FFFFFF80',
+    height: 22,
+    backgroundColor: '#FFFFFF',
   },
   healthTrackBase: {
-    ...StyleSheet.absoluteFillObject,
     flexDirection: 'row',
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
+    borderRadius: 999,
   },
   healthTrackStripe: {
-    flex: 1,
+    height: '100%',
   },
-  healthTrackMask: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: '#FFF8FCDD',
+  healthLegend: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+    marginTop: 14,
   },
-  healthFooter: {
+  healthLegendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 6,
+  },
+  healthLegendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 999,
+  },
+  healthLegendText: {
+    color: '#6E678C',
+    fontSize: 12,
+    fontFamily: FONT_TITLE,
+  },
+  healthFooter: {
     marginTop: 14,
   },
   healthHint: {
     color: '#6F668E',
     fontSize: 13,
     fontFamily: FONT_BODY,
-    flex: 1,
     lineHeight: 20,
   },
   healthPercent: {
+    marginTop: 10,
     color: '#F97393',
-    fontSize: 24,
+    fontSize: 18,
     fontFamily: FONT_TITLE,
-    marginLeft: 12,
   },
   nudgeCard: {
     marginTop: 16,
