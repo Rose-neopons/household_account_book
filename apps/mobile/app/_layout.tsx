@@ -19,6 +19,7 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ title: "AI Pocket Guard" }} />
+        <Stack.Screen name="review" options={{ title: "기록 확인" }} />
       </Stack>
     </QueryClientProvider>
   );
