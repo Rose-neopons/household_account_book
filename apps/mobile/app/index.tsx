@@ -16,16 +16,21 @@ import { create } from 'zustand';
 
 const FONT_BODY = 'MemomentKkukkukk';
 const FONT_TITLE = 'MemomentKkukkukk';
-const BUDGET_RATIO = 1;
+const BUDGET_RATIO = 0.9;
 const BOTTLE_STRIPES = ['#86EFAC', '#93C5FD', '#C4B5FD', '#F9A8D4'];
 const TRACK_STRIPES = [...BOTTLE_STRIPES].reverse();
 const BOTTLE_GLASS_HEIGHT = 144;
 const CATEGORY_SPEND = [
-  { label: '식비', ratio: 0.42, color: '#F9A8D4' },
-  { label: '쇼핑', ratio: 0.24, color: '#C4B5FD' },
-  { label: '교통', ratio: 0.18, color: '#93C5FD' },
-  { label: '커피', ratio: 0.16, color: '#86EFAC' },
-];
+  {
+    label: '식비',
+    ratio: 0.42,
+    color: '#F9A8D4',
+    icon: 'silverware-fork-knife',
+  },
+  { label: '쇼핑', ratio: 0.24, color: '#C4B5FD', icon: 'shopping-outline' },
+  { label: '교통', ratio: 0.18, color: '#93C5FD', icon: 'bus' },
+  { label: '커피', ratio: 0.16, color: '#86EFAC', icon: 'coffee-outline' },
+] as const;
 
 type QuickInputState = {
   prompt: string;
@@ -77,7 +82,8 @@ function MascotBubble() {
       <View style={styles.mascotSpeech}>
         <Text style={styles.mascotSpeechTitle}>포켓가드 한마디</Text>
         <Text style={styles.mascotSpeechBody}>
-          오늘은 배가 든든해서 기분이 좋아. 이 흐름이면 우리 둘 다 안심하고 잘 수 있을 것 같아.
+          오늘은 배가 든든해서 기분이 좋아. 이 흐름이면 우리 둘 다 안심하고 잘
+          수 있을 것 같아.
         </Text>
       </View>
     </Animated.View>
@@ -184,7 +190,10 @@ function RainbowBottle() {
                       transform: [{ translateY: waveAnim }],
                     },
                   ]}
-                />
+                >
+                  <View style={styles.smartBottleWaveBubbleLeft} />
+                  <View style={styles.smartBottleWaveBubbleRight} />
+                </Animated.View>
               </Animated.View>
 
               <View style={styles.smartBottleFace}>
@@ -268,10 +277,8 @@ export default function HomeScreen() {
         <View style={styles.healthCard}>
           <View style={styles.healthHeader}>
             <View>
-              <Text style={styles.sectionTitle}>카테고리별 소비 분포</Text>
-              <Text style={styles.sectionCaption}>
-                어디에 가장 많이 쓰고 있는지, 색으로 빠르게 읽을 수 있게 정리했어요.
-              </Text>
+              <Text style={styles.sectionTitle}>카테고리 소비 비중</Text>
+              <Text style={styles.sectionCaption}>한눈에 보는 소비 비중</Text>
             </View>
             <Text style={styles.sectionBadge}>분석</Text>
           </View>
@@ -290,11 +297,32 @@ export default function HomeScreen() {
             </View>
           </View>
 
+          <View style={styles.healthEmojiRow}>
+            {CATEGORY_SPEND.map((item) => (
+              <View
+                key={`emoji-${item.label}`}
+                style={[
+                  styles.healthEmojiBubble,
+                  { backgroundColor: `${item.color}33` },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  color="#5E4B91"
+                  name={item.icon}
+                  size={18}
+                />
+              </View>
+            ))}
+          </View>
+
           <View style={styles.healthLegend}>
             {CATEGORY_SPEND.map((item) => (
               <View key={item.label} style={styles.healthLegendItem}>
                 <View
-                  style={[styles.healthLegendDot, { backgroundColor: item.color }]}
+                  style={[
+                    styles.healthLegendDot,
+                    { backgroundColor: item.color },
+                  ]}
                 />
                 <Text style={styles.healthLegendText}>
                   {item.label} {Math.round(item.ratio * 100)}%
@@ -305,9 +333,33 @@ export default function HomeScreen() {
 
           <View style={styles.healthFooter}>
             <Text style={styles.healthHint}>
-              이번 달엔 {topCategory.label} 비중이 가장 커요. 특히 약속 있는 주에 식비가 확 늘어나는 패턴이 보여요.
+              {topCategory.label} 비중이 가장 커요.
             </Text>
-            <Text style={styles.healthPercent}>{topCategory.label}</Text>
+          </View>
+
+          <View style={styles.healthSummaryCard}>
+            <Text style={styles.healthSummaryTitle}>
+              이번 달 집중 관리 항목
+            </Text>
+            <View style={styles.healthSummaryHeaderRow}>
+              <Text style={styles.healthSummaryCategory}>
+                {topCategory.label}
+              </Text>
+              <View style={styles.healthSummaryRatioBadge}>
+                <Text style={styles.healthSummaryRatioText}>
+                  {Math.round(topCategory.ratio * 100)}%
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.healthSummaryInsight}>배달 음식 많아요!</Text>
+            <View style={styles.healthSummaryTipRow}>
+              <MaterialCommunityIcons
+                color="#F97393"
+                name="food-variant"
+                size={14}
+              />
+              <Text style={styles.healthSummaryTip}>내일은 집밥 어때요?</Text>
+            </View>
           </View>
         </View>
 
@@ -634,12 +686,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   smartBottleWave: {
-    marginTop: -6,
-    height: 14,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
+    marginTop: -10,
+    height: 22,
     backgroundColor: '#FFFFFFCC',
     opacity: 0.85,
+    overflow: 'hidden',
+  },
+  smartBottleWaveBubbleLeft: {
+    position: 'absolute',
+    left: -8,
+    bottom: 4,
+    width: 58,
+    height: 18,
+    borderRadius: 999,
+    backgroundColor: '#FFFFFFCC',
+  },
+  smartBottleWaveBubbleRight: {
+    position: 'absolute',
+    right: -6,
+    bottom: 0,
+    width: 56,
+    height: 20,
+    borderRadius: 999,
+    backgroundColor: '#FFFFFFCC',
   },
   smartBottleWaveHidden: {
     opacity: 0,
@@ -706,9 +775,9 @@ const styles = StyleSheet.create({
   },
   sectionCaption: {
     color: '#7D739E',
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: FONT_BODY,
-    lineHeight: 21,
+    lineHeight: 17,
     marginTop: 6,
     maxWidth: 240,
   },
@@ -740,11 +809,24 @@ const styles = StyleSheet.create({
   healthTrackStripe: {
     height: '100%',
   },
+  healthEmojiRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    paddingHorizontal: 4,
+  },
+  healthEmojiBubble: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   healthLegend: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
-    marginTop: 14,
+    marginTop: 12,
   },
   healthLegendItem: {
     flexDirection: 'row',
@@ -766,14 +848,59 @@ const styles = StyleSheet.create({
   },
   healthHint: {
     color: '#6F668E',
+    fontSize: 12,
+    fontFamily: FONT_BODY,
+    lineHeight: 17,
+  },
+  healthSummaryCard: {
+    marginTop: 16,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+  },
+  healthSummaryTitle: {
+    color: '#4B426F',
+    fontSize: 14,
+    fontFamily: FONT_TITLE,
+  },
+  healthSummaryHeaderRow: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  healthSummaryCategory: {
+    color: '#4B426F',
+    fontSize: 24,
+    fontFamily: FONT_TITLE,
+  },
+  healthSummaryRatioBadge: {
+    borderRadius: 999,
+    backgroundColor: '#FDE7F1',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  healthSummaryRatioText: {
+    color: '#F97393',
+    fontSize: 13,
+    fontFamily: FONT_TITLE,
+  },
+  healthSummaryInsight: {
+    marginTop: 8,
+    color: '#6F668E',
     fontSize: 13,
     fontFamily: FONT_BODY,
-    lineHeight: 20,
   },
-  healthPercent: {
-    marginTop: 10,
+  healthSummaryTipRow: {
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  healthSummaryTip: {
     color: '#F97393',
-    fontSize: 18,
+    fontSize: 12,
     fontFamily: FONT_TITLE,
   },
   nudgeCard: {
